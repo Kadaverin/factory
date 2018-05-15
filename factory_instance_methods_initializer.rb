@@ -11,21 +11,21 @@ class FactoryInstanceMethodsInitializer < Module
         values.each_with_index { |val, i| send("#{attributes[i]}=", val) }
       end
 
-      define_method(:length) { attributes.length }
-
-      define_method(:members) { attributes }
+      define_method(:each_pair) { |&block| to_h.each_pair(&block) }
 
       define_method(:to_a) { attributes.map { |attr| send(attr) } }
+
+      define_method(:select) { |&block| values.select(&block) }
 
       define_method(:to_h) { attributes.zip(values).to_h }
 
       define_method(:each) { |&block| values.each(&block) }
-
-      define_method(:each_pair) { |&block| to_h.each_pair(&block) }
-
-      define_method(:select) { |&block| values.select(&block) }
-
+      
       define_method(:dig) { |*args| to_h.dig(*args) }
+
+      define_method(:length) { attributes.length }
+
+      define_method(:members) { attributes }
 
       define_method :== do |other|
         (other.is_a? struct_class) && (values == other.values)
