@@ -24,8 +24,8 @@ class FactoryInstanceMethodsInitializer < Module
       define_method(:each_pair) { |&block| to_h.each_pair(&block) }
 
       define_method(:select) { |&block| values.select(&block) }
+
       define_method(:dig) { |*args| to_h.dig(*args) }
-      end
 
       define_method :== do |other|
         (other.is_a? struct_class) && (values == other.values)
