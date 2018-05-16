@@ -5,7 +5,6 @@
 class FactoryInstanceMethodsInitializer < Module
   def initialize(*attributes, &init_block)
     super() do
-
       attr_accessor(*attributes)
       class_eval(&init_block) if init_block
 

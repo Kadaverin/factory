@@ -5,13 +5,14 @@ p 'STRUCT'
 
 Person = Struct.new(:name, :s)
 d1 = Person.new('dave', 's')
+p d1.valuest_at(0..3)
 
 p 'FACTORY'
 
-Person2 = Factory.new(:name, :surname, :s, :f, :g, :r, :g) do 
-    def hello
-        p "Hello, I my name is #{self.name}"
-    end
+Person2 = Factory.new(:name, :surname, :s, :f, :g, :r, :g) do
+  def hello
+    p "Hello, I my name is #{name}"
+  end
 end
 
 d2 = Person2.new('Dave', 'Hell', 'f', 'g', 'd', 'f', 'd')
@@ -28,10 +29,10 @@ d3 = Factory::Person3.new('name', 'surname')
 
 p d2.values_at(0..1, 2...3, 3, 5)
 
-# d3[-1] = 'Modifed Dave'
+d3[-1] = 'Modifed Dave'
 
-# d3.each { |k| p k }
-# d3.each_pair { |k, v| p "#{k} : #{v}" }
+d3.each { |k| p k }
+d3.each_pair { |k, v| p "#{k} : #{v}" }
 # def m (t, *args)
 #     p t.values_at(*args)
 # end
