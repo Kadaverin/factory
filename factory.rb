@@ -90,7 +90,7 @@ class Factory
     (other.class == self.class) && (values.eql? other.values)
   end
 
-  def hash 
+  def hash
     values.hash
   end
 end
