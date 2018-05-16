@@ -3,9 +3,11 @@
 # Create all methods like valuas_at, select and other
 #
 class FactoryInstanceMethodsInitializer < Module
-  def initialize(*attributes)
+  def initialize(*attributes, &init_block)
     super() do
+
       attr_accessor(*attributes)
+      class_eval(&init_block) if init_block
 
       define_method :initialize do |*values|
         values.each_with_index { |val, i| send("#{attributes[i]}=", val) }
@@ -15,12 +17,14 @@ class FactoryInstanceMethodsInitializer < Module
 
       define_method(:to_a) { attributes.map { |attr| send(attr) } }
 
+      define_method(:values_at) { |*keys| values.values_at(*keys) }
+
       define_method(:select) { |&block| values.select(&block) }
 
       define_method(:to_h) { attributes.zip(values).to_h }
 
       define_method(:each) { |&block| values.each(&block) }
-      
+
       define_method(:dig) { |*args| to_h.dig(*args) }
 
       define_method(:length) { attributes.length }
@@ -29,6 +33,10 @@ class FactoryInstanceMethodsInitializer < Module
 
       define_method :== do |other|
         (other.is_a? struct_class) && (values == other.values)
+      end
+
+      define_method :eql? do |other|
+        (other.is_a? struct_class) && (values.eql? other.values)
       end
 
       define_method :[] do |index|
@@ -43,19 +51,6 @@ class FactoryInstanceMethodsInitializer < Module
           send(index)
         else raise ArgumentError
         end
-      end
-
-      define_method :values_at do |*keys|
-        result = []
-
-        keys.each do |key|
-          case key.class.name
-          when 'Integer' then result << self[key]
-          when 'Range' then key.to_a.each { |i| result << self[i] }
-          else raise ArgumentError
-          end
-        end
-        result
       end
 
       define_method :[]= do |key, value|
@@ -77,3 +72,17 @@ class FactoryInstanceMethodsInitializer < Module
     end
   end
 end
+
+# old version of :values_at method
+# define_method :values_at do |*keys|
+#   result = []
+
+#   keys.each do |key|
+#     case key.class.name
+#     when 'Integer' then result << self[key]
+#     when 'Range' then key.to_a.each { |i| result << self[i] }
+#     else raise ArgumentError
+#     end
+#   end
+#   result
+# end

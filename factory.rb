@@ -6,11 +6,11 @@ require_relative './factory_instance_methods_initializer'
 class Factory
   include Enumerable
 
-  def self.new(*attributes)
+  def self.new(*attributes, &init_block)
     class_name = attributes.shift  if attributes[0].is_a? String
 
     struct_class = Class.new(self) do
-      include FactoryInstanceMethodsInitializer.new(*attributes)
+      include FactoryInstanceMethodsInitializer.new(*attributes, &init_block)
     end
     # struct_class is a subclass of Factory , so we had to redefine method :new
     struct_class.define_singleton_method(:new, Object.method(:new))
