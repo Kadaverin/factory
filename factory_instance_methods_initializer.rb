@@ -28,6 +28,8 @@ class FactoryInstanceMethodsInitializer < Module
 
     define_method(:members) { attributes }
 
+    define_method(:hash) { values.hash }
+
     define_method :== do |other|
       (self.class == other.class) && (values == other.values)
     end
@@ -68,7 +70,7 @@ class FactoryInstanceMethodsInitializer < Module
     alias_method :size, :length
     alias_method :values, :to_a
     alias_method :to_s, :inspect
-    end
+  end
 end
 
 # old version of :values_at method
