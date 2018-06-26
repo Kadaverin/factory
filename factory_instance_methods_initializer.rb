@@ -7,6 +7,7 @@ class FactoryInstanceMethodsInitializer < Module
     attr_accessor(*attributes)
 
     define_method :initialize do |*values|
+      raise ArgumentError unless values.length == attributes.length
       values.each_with_index { |val, i| send("#{attributes[i]}=", val) }
     end
 
@@ -14,7 +15,10 @@ class FactoryInstanceMethodsInitializer < Module
 
     define_method(:to_a) { attributes.map { |attr| send(attr) } }
 
-    define_method(:values_at) { |*keys| values.values_at(*keys) }
+    define_method(:values_at) do |*keys|
+      raise IndexError if keys.any? { |key| key.abs > attributes.length }
+      values.values_at(*keys)
+    end
 
     define_method(:select) { |&block| values.select(&block) }
 
@@ -41,12 +45,13 @@ class FactoryInstanceMethodsInitializer < Module
     define_method :[] do |index|
       case index.class.name
 
-      when 'Integer'
+      when 'Integer', 'Float', 'Numeric'
+        index = index.floor
         raise IndexError unless attributes[index]
         send(attributes[index].to_s)
 
       when 'String', 'Symbol'
-        raise NameError unless attributes.include? index
+        raise NameError unless attributes.include? index.to_sym
         send(index)
       else raise ArgumentError
       end
@@ -56,7 +61,7 @@ class FactoryInstanceMethodsInitializer < Module
       case key.class.name
 
       when 'String', 'Symbol'
-        raise NameError unless attributes.include? key
+        raise NameError unless attributes.include? key.to_sym
         send("#{key}=", value)
 
       when 'Integer'
@@ -72,17 +77,3 @@ class FactoryInstanceMethodsInitializer < Module
     alias_method :to_s, :inspect
   end
 end
-
-# old version of :values_at method
-# define_method :values_at do |*keys|
-#   result = []
-
-#   keys.each do |key|
-#     case key.class.name
-#     when 'Integer' then result << self[key]
-#     when 'Range' then key.to_a.each { |i| result << self[i] }
-#     else raise ArgumentError
-#     end
-#   end
-#   result
-# end
